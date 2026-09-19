@@ -20,7 +20,7 @@ import torch.nn.functional as F
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn import GCNConv, SAGEConv, GATConv, global_mean_pool
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report, roc_auc_score
 from sklearn.model_selection import train_test_split
 
 
@@ -130,6 +130,13 @@ def evaluate(model, loader, criterion, device):
     acc = accuracy_score(all_targets, all_preds)
     p, r, f1, _ = precision_recall_fscore_support(all_targets, all_preds, average='binary', zero_division=0)
     avg_loss = total_loss / len(loader.dataset)
+    try:
+        auc = roc_auc_score(all_targets, all_probs)
+    except Exception:
+        auc = 0.5
+    cm = confusion_matrix(all_targets, all_preds, labels=[0, 1])
+    tn, fp, fn, tp = cm.ravel()
+    fpr = float(fp) / float(fp + tn) if (fp + tn) > 0 else 0.0
 
     metrics = {
         'loss': avg_loss,
@@ -137,11 +144,14 @@ def evaluate(model, loader, criterion, device):
         'precision': p,
         'recall': r,
         'f1': f1,
+        'auc': auc,
+        'fpr': fpr,
         'targets': all_targets,
         'preds': all_preds,
         'probs': all_probs
     }
     return metrics
+
 
 
 def train_and_freeze(
@@ -253,6 +263,8 @@ def train_and_freeze(
     print(f"Precision: {test_metrics['precision']:.4f}")
     print(f"Recall:    {test_metrics['recall']:.4f}")
     print(f"F1-Score:  {test_metrics['f1']:.4f}")
+    print(f"ROC-AUC:   {test_metrics['auc']:.4f}")
+    print(f"FPR:       {test_metrics['fpr']:.4f} ({test_metrics['fpr']*100:.2f}%)")
     print("\nConfusion Matrix:")
     cm = confusion_matrix(test_metrics['targets'], test_metrics['preds'])
     print(f"[[TN={cm[0,0]}, FP={cm[0,1]}],\n [FN={cm[1,0]}, TP={cm[1,1]}]]")
@@ -291,7 +303,9 @@ def train_and_freeze(
             'accuracy': test_metrics['accuracy'],
             'precision': test_metrics['precision'],
             'recall': test_metrics['recall'],
-            'f1': test_metrics['f1']
+            'f1': test_metrics['f1'],
+            'auc': test_metrics['auc'],
+            'fpr': test_metrics['fpr']
         }
     }
     torch.save(checkpoint, checkpoint_path)
@@ -301,13 +315,36 @@ def train_and_freeze(
 
 
 if __name__ == '__main__':
-    train_and_freeze(
-        data_path='data/processed_subgraphs.pt',
-        checkpoint_dir='checkpoints',
-        splits_path='data/splits.pt',
-        conv_type='sage',
-        epochs=40,
-        batch_size=32,
-        lr=0.005,
-        seed=42
-    )
+    import argparse
+    parser = argparse.ArgumentParser(description='Train and Freeze Provenance GNN Backbone Detector')
+    parser.add_argument('--dataset', type=str, default='streamspot', choices=['streamspot', 'darpa_cadets'])
+    parser.add_argument('--conv_type', type=str, default='sage')
+    parser.add_argument('--epochs', type=int, default=40)
+    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--lr', type=float, default=0.005)
+    parser.add_argument('--seed', type=int, default=42)
+    args = parser.parse_args()
+
+    if args.dataset == 'streamspot':
+        train_and_freeze(
+            data_path='data/processed_subgraphs.pt',
+            checkpoint_dir='checkpoints',
+            splits_path='data/splits.pt',
+            conv_type=args.conv_type,
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            lr=args.lr,
+            seed=args.seed
+        )
+    elif args.dataset == 'darpa_cadets':
+        train_and_freeze(
+            data_path='data/darpa_cadets/processed_subgraphs.pt',
+            checkpoint_dir='checkpoints/darpa_cadets',
+            splits_path='data/darpa_cadets/splits.pt',
+            conv_type=args.conv_type,
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            lr=args.lr,
+            seed=args.seed
+        )
+

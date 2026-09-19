@@ -1,0 +1,178 @@
+{
+  "comparison_table": [
+    [
+      "Explainer Category",
+      "Probe-based Attribution",
+      "Post-hoc MI Masking",
+      "Parameterized Masking"
+    ],
+    [
+      "Base Literature",
+      "Pelletreau-Duris 2025 / ProvX 2025",
+      "Ying et al. NeurIPS 2019",
+      "Luo et al. NeurIPS 2020"
+    ],
+    [
+      "Layer-Wise Granularity",
+      "Yes (l* = 1)",
+      "No (Final layer only)",
+      "No (Final layer only)"
+    ],
+    [
+      "Log-Grounded Resolution",
+      "Yes (Real process/file/IP)",
+      "No (Raw node/edge masks)",
+      "No (Raw edge masks)"
+    ],
+    [
+      "Probability of Necessity",
+      "0.444 drop",
+      "0.918 drop",
+      "N/A"
+    ],
+    [
+      "Inference Overhead",
+      "< 0.05s (1 forward pass)",
+      "~0.6s (40-step optim)",
+      "~0.02s (neural pass)"
+    ],
+    [
+      "Backbone Invariance",
+      "Frozen (Strict read-only)",
+      "Requires gradients",
+      "Requires embeddings"
+    ]
+  ],
+  "pn_results": {
+    "cohort_size": 10,
+    "k_nodes": 3,
+    "our_method": {
+      "flip_rate": 0.0,
+      "flip_count": 0,
+      "mean_prob_drop": 0.44438098669052123
+    },
+    "gnn_explainer": {
+      "flip_rate": 0.9,
+      "flip_count": 9,
+      "mean_prob_drop": 0.9182561159133911
+    },
+    "random": {
+      "flip_rate": 0.0,
+      "flip_count": 0,
+      "mean_prob_drop": 2.968311309814453e-06
+    }
+  },
+  "case_studies": [
+    {
+      "case_name": "Malicious Subgraph #1",
+      "nodes": 150,
+      "edges": 173,
+      "our_method": {
+        "latency_sec": 0.0044,
+        "layer_identified": "l* = 1 (layer_1)",
+        "top_attributed_nodes": [
+          "process:/tmp/test",
+          "file:file_269399",
+          "file:file_269414"
+        ],
+        "log_grounded_evidence": [
+          "[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)",
+          "[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269399)"
+        ],
+        "explanation": "By layer 1 (layer_1), the model had already committed to 'malicious' (Confidence: 99.1%), driven primarily by: Entity 'process:/tmp/test' (Attrib: 0.309) participating in: [\"[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)\", \"[Cadets Event] file(/var/run/ld-elf.so.hints) --EVENT_READ--> process(/tmp/test)\"]; Entity 'file:file_269399' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269399)\"]; Entity 'file:file_269414' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269414)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.0259,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": [
+          "Node idx:143",
+          "Node idx:148",
+          "Node idx:142"
+        ],
+        "salient_edges_count": 2,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0004,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    },
+    {
+      "case_name": "Malicious Subgraph #2",
+      "nodes": 150,
+      "edges": 173,
+      "our_method": {
+        "latency_sec": 0.0015,
+        "layer_identified": "l* = 1 (layer_1)",
+        "top_attributed_nodes": [
+          "process:/tmp/test",
+          "file:file_269398",
+          "file:file_269414"
+        ],
+        "log_grounded_evidence": [
+          "[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)",
+          "[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269398)"
+        ],
+        "explanation": "By layer 1 (layer_1), the model had already committed to 'malicious' (Confidence: 99.1%), driven primarily by: Entity 'process:/tmp/test' (Attrib: 0.309) participating in: [\"[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)\", \"[Cadets Event] file(/var/run/ld-elf.so.hints) --EVENT_READ--> process(/tmp/test)\"]; Entity 'file:file_269398' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269398)\"]; Entity 'file:file_269414' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269414)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.0256,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": [
+          "Node idx:144",
+          "Node idx:149",
+          "Node idx:143"
+        ],
+        "salient_edges_count": 1,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0004,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    },
+    {
+      "case_name": "Benign Subgraph #1",
+      "nodes": 150,
+      "edges": 193,
+      "our_method": {
+        "latency_sec": 0.0015,
+        "layer_identified": "l* = 1 (layer_1)",
+        "top_attributed_nodes": [
+          "file:file_3838",
+          "netflow:netflow_9060",
+          "netflow:netflow_346"
+        ],
+        "log_grounded_evidence": [
+          "[Cadets Event] process(process_5) --EVENT_WRITE--> file(file_3838)",
+          "[Cadets Event] process(process_5) --EVENT_CONNECT--> netflow(netflow_9060)"
+        ],
+        "explanation": "By layer 1 (layer_1), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'file:file_3838' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_WRITE--> file(file_3838)\"]; Entity 'netflow:netflow_9060' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_CONNECT--> netflow(netflow_9060)\"]; Entity 'netflow:netflow_346' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_CONNECT--> netflow(netflow_346)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.026,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": [
+          "Node idx:114",
+          "Node idx:93",
+          "Node idx:0"
+        ],
+        "salient_edges_count": 25,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0004,
+        "layer_identified": "Final Layer Only (Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    }
+  ]
+}

@@ -198,4 +198,25 @@ def train_and_evaluate_probes(
 
 
 if __name__ == '__main__':
-    train_and_evaluate_probes()
+    import argparse
+    parser = argparse.ArgumentParser(description='Train and Evaluate Per-Layer Linear Probes')
+    parser.add_argument('--dataset', type=str, default='streamspot', choices=['streamspot', 'darpa_cadets'])
+    args = parser.parse_args()
+
+    if args.dataset == 'streamspot':
+        train_and_evaluate_probes(
+            checkpoint_path='checkpoints/frozen_backbone.pt',
+            data_path='data/processed_subgraphs.pt',
+            splits_path='data/splits.pt',
+            output_dir='results',
+            probe_checkpoint_path='checkpoints/probes.pkl'
+        )
+    elif args.dataset == 'darpa_cadets':
+        train_and_evaluate_probes(
+            checkpoint_path='checkpoints/darpa_cadets/frozen_backbone.pt',
+            data_path='data/darpa_cadets/processed_subgraphs.pt',
+            splits_path='data/darpa_cadets/splits.pt',
+            output_dir='results/darpa_cadets',
+            probe_checkpoint_path='checkpoints/darpa_cadets/probes.pkl'
+        )
+

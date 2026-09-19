@@ -97,35 +97,47 @@ python3 extract_embeddings.py
 ### Milestone 4: Train Linear Probes
 Trains per-layer logistic regression probes and generates accuracy curves:
 ```bash
-python3 probes.py
+python3 probes.py --dataset=streamspot
+python3 probes.py --dataset=darpa_cadets
 ```
-- **Layer 0 (Input)**: 68.24% Acc | ROC-AUC: 0.7483
-- **Layer 1**: 81.18% Acc | ROC-AUC: 0.8767
-- **Layer 2**: 91.76% Acc | ROC-AUC: 0.9640
-- **Layer 3**: 91.76% Acc | ROC-AUC: 0.9668
+- **StreamSpot**: L0: 68.24% Acc | L1: 81.18% Acc | L2: 91.76% Acc | L3: 91.76% Acc
+- **DARPA Cadets**: L0: 95.00% Acc | L1: 98.33% Acc | L2: 98.33% Acc | L3: 100.00% Acc
 
 ### Milestone 5: Fidelity Validation & $l^*$ Identification
-Measures agreement against the frozen GNN's actual predictions:
+Measures agreement against the frozen GNN's actual predictions and generates comparative plots:
 ```bash
-python3 fidelity.py
+python3 fidelity.py --dataset=streamspot
+python3 fidelity.py --dataset=darpa_cadets
 ```
-- **Phase-Transition Discovery**: $l^* = 2$ (Layer 2 achieves 92.94% agreement, 95.24% on attacks, $\kappa = 0.8589$, $r = 0.9719$).
+- **StreamSpot Phase-Transition**: $l^* = 2$ (Layer 2 achieves 92.94% agreement, $\kappa = 0.8589$, $r = 0.9719$).
+- **DARPA Cadets Phase-Transition**: $l^* = 1$ (Layer 1 achieves 96.67% agreement, $\kappa = 0.9331$, $r = 0.9617$).
+- Comparative plot saved to `results/side_by_side_fidelity.png`.
 
 ### Milestone 6: Node Attribution & Audit Log Grounding
-Attributes influential nodes at $l^* = 2$ using Captum and maps back to audit logs:
+Attributes influential nodes at $l^*$ using Captum and maps back to audit logs / process paths:
 ```bash
-python3 attribution.py
+python3 attribution.py --dataset=streamspot
+python3 attribution.py --dataset=darpa_cadets
 ```
 
-### Milestone 7: Baseline Comparison
-Runs PyG's official GNNExplainer and PGExplainer:
+### Milestone 7: Baseline Comparison & Probability of Necessity (PN)
+Runs PyG's official GNNExplainer and PGExplainer, and evaluates prediction flip-rates:
 ```bash
-python3 baselines.py
+python3 baselines.py --dataset=streamspot
+python3 baselines.py --dataset=darpa_cadets
 ```
 
 ### Milestone 8: Interactive Demo Dashboard
-Launches the interactive Streamlit web dashboard:
+Launches the interactive Streamlit web dashboard with live dataset switching:
 ```bash
 streamlit run app.py
 ```
-The dashboard allows live inspection of any subgraph, renders per-layer fidelity and correlation plots, displays top-attributed nodes via Captum, and prints human-readable audit log evidence.
+The dashboard allows live inspection of any subgraph across both StreamSpot and DARPA Cadets, renders per-layer fidelity and correlation plots, displays top-attributed nodes via Captum, and prints human-readable audit log evidence.
+
+---
+
+## 5. Comparative Evaluation Summary
+
+For detailed numerical tables, ProvX metrics (Acc, Prec, Rec, F1, ROC-AUC, FPR), Probability of Necessity (PN) flip-rate comparisons, and an end-to-end case study of the Cadets Drakon APT attack, see:
+👉 **[RESULTS_SUMMARY.md](RESULTS_SUMMARY.md)**
+

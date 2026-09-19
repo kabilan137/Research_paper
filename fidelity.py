@@ -275,5 +275,82 @@ def evaluate_fidelity(
     }
 
 
+def generate_side_by_side_plots(
+    streamspot_l_star_path: str = 'checkpoints/l_star.json',
+    cadets_l_star_path: str = 'checkpoints/darpa_cadets/l_star.json',
+    output_path: str = 'results/side_by_side_fidelity.png'
+):
+    """Plots side-by-side fidelity comparison for StreamSpot and DARPA TC E3 Cadets."""
+    if not os.path.exists(streamspot_l_star_path) or not os.path.exists(cadets_l_star_path):
+        return
+
+    with open(streamspot_l_star_path, 'r') as f:
+        ss_data = json.load(f)
+    with open(cadets_l_star_path, 'r') as f:
+        cad_data = json.load(f)
+
+    ss_metrics = ss_data['fidelity_metrics']
+    cad_metrics = cad_data['fidelity_metrics']
+
+    layers = ['layer_0 (input)', 'layer_1', 'layer_2', 'layer_3']
+    x_labels = ['Input (L0)', 'Layer 1', 'Layer 2', 'Layer 3']
+
+    ss_agr = [ss_metrics[l]['agreement'] * 100 for l in layers]
+    cad_agr = [cad_metrics[l]['agreement'] * 100 for l in layers]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5), dpi=150, sharey=True)
+    plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
+
+    # Subplot 1: StreamSpot
+    ax1.plot(x_labels, ss_agr, marker='o', linewidth=2.5, markersize=8, color='#1f77b4', label='Agreement with GNN (%)')
+    ax1.axvline(x=ss_data['l_star_index'], color='#9467bd', linestyle='-.', linewidth=2.0, label=f"Phase-Transition l*={ss_data['l_star_index']}")
+    for i, txt in enumerate(ss_agr):
+        ax1.annotate(f"{txt:.1f}%", (x_labels[i], txt), textcoords="offset points", xytext=(0, 10), ha='center', fontweight='bold', color='#1f77b4')
+    ax1.set_title(f"StreamSpot Dataset (Toy/Benchmark, l*={ss_data['l_star_index']})", fontsize=12, fontweight='bold')
+    ax1.set_xlabel("GNN Layer", fontsize=11)
+    ax1.set_ylabel("Fidelity / Agreement with Frozen GNN (%)", fontsize=11)
+    ax1.set_ylim(60, 105)
+    ax1.legend(loc='lower right', frameon=True, facecolor='white')
+
+    # Subplot 2: DARPA Cadets
+    ax2.plot(x_labels, cad_agr, marker='s', linewidth=2.5, markersize=8, color='#d62728', label='Agreement with GNN (%)')
+    ax2.axvline(x=cad_data['l_star_index'], color='#9467bd', linestyle='-.', linewidth=2.0, label=f"Phase-Transition l*={cad_data['l_star_index']}")
+    for i, txt in enumerate(cad_agr):
+        ax2.annotate(f"{txt:.1f}%", (x_labels[i], txt), textcoords="offset points", xytext=(0, 10), ha='center', fontweight='bold', color='#d62728')
+    ax2.set_title(f"DARPA TC E3 Cadets (Enterprise APT, l*={cad_data['l_star_index']})", fontsize=12, fontweight='bold')
+    ax2.set_xlabel("GNN Layer", fontsize=11)
+    ax2.legend(loc='lower right', frameon=True, facecolor='white')
+
+    plt.suptitle("Side-by-Side Fidelity & Decision Phase-Transition Comparison", fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.savefig(output_path, bbox_inches='tight')
+    plt.close()
+    print(f"Side-by-side comparative fidelity plot saved to: {output_path}")
+
+
 if __name__ == '__main__':
-    evaluate_fidelity()
+    import argparse
+    parser = argparse.ArgumentParser(description='Evaluate Fidelity & Phase-Transition Layer')
+    parser.add_argument('--dataset', type=str, default='streamspot', choices=['streamspot', 'darpa_cadets'])
+    args = parser.parse_args()
+
+    if args.dataset == 'streamspot':
+        evaluate_fidelity(
+            checkpoint_path='checkpoints/frozen_backbone.pt',
+            probe_checkpoint_path='checkpoints/probes.pkl',
+            data_path='data/processed_subgraphs.pt',
+            splits_path='data/splits.pt',
+            output_dir='results',
+            l_star_path='checkpoints/l_star.json'
+        )
+    elif args.dataset == 'darpa_cadets':
+        evaluate_fidelity(
+            checkpoint_path='checkpoints/darpa_cadets/frozen_backbone.pt',
+            probe_checkpoint_path='checkpoints/darpa_cadets/probes.pkl',
+            data_path='data/darpa_cadets/processed_subgraphs.pt',
+            splits_path='data/darpa_cadets/splits.pt',
+            output_dir='results/darpa_cadets',
+            l_star_path='checkpoints/darpa_cadets/l_star.json'
+        )
+        generate_side_by_side_plots()
+

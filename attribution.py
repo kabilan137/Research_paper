@@ -150,13 +150,18 @@ class LogGroundedExplainer:
         # Step 4: Map top nodes back to original audit log lines via lookup table
         top_node_details = []
         for rank, node_idx in enumerate(top_indices, 1):
-            entity_id = subgraph.node_map[node_idx] if hasattr(subgraph, 'node_map') else str(node_idx)
-            raw_type_idx = subgraph.x[node_idx, :8].argmax().item() if subgraph.x.size(1) >= 8 else 0
-            type_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-            type_char = type_keys[raw_type_idx] if raw_type_idx < len(type_keys) else 'a'
-            entity_type = NODE_TYPE_MAP.get(type_char, 'entity')
+            if hasattr(subgraph, 'raw_attributes') and node_idx in subgraph.raw_attributes:
+                entity_id = subgraph.raw_attributes[node_idx].get('name', str(node_idx))
+                entity_type = subgraph.raw_attributes[node_idx].get('type', 'entity')
+            else:
+                entity_id = subgraph.node_map[node_idx] if hasattr(subgraph, 'node_map') else str(node_idx)
+                raw_type_idx = subgraph.x[node_idx, :8].argmax().item() if subgraph.x.size(1) >= 8 else 0
+                type_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+                type_char = type_keys[raw_type_idx] if raw_type_idx < len(type_keys) else 'a'
+                entity_type = NODE_TYPE_MAP.get(type_char, 'entity')
 
             log_lines = subgraph.node_to_log.get(node_idx, []) if hasattr(subgraph, 'node_to_log') else []
+
             # Deduplicate log lines while preserving chronological order
             seen = set()
             unique_logs = []
@@ -206,7 +211,14 @@ class LogGroundedExplainer:
         }
 
 
-def run_m6_attribution_demo(output_json: str = 'results/m6_explanations.json'):
+def run_m6_attribution_demo(
+    checkpoint_path: str = 'checkpoints/frozen_backbone.pt',
+    probe_checkpoint_path: str = 'checkpoints/probes.pkl',
+    l_star_path: str = 'checkpoints/l_star.json',
+    data_path: str = 'data/processed_subgraphs.pt',
+    splits_path: str = 'data/splits.pt',
+    output_json: str = 'results/m6_explanations.json'
+):
     """
     Executes Milestone 6 demonstration across representative test subgraphs
     (both Malicious and Benign) and outputs human-readable progressive explanations.
@@ -216,11 +228,15 @@ def run_m6_attribution_demo(output_json: str = 'results/m6_explanations.json'):
     print("Theoretical Basis: ProvX (Wu et al. 2025) & Integrated Gradients (Captum)")
     print("=" * 75)
 
-    explainer = LogGroundedExplainer()
+    explainer = LogGroundedExplainer(
+        checkpoint_path=checkpoint_path,
+        probe_checkpoint_path=probe_checkpoint_path,
+        l_star_path=l_star_path
+    )
     print(f"Loaded Frozen Detector with target phase-transition layer l* = {explainer.l_star_idx} ({explainer.l_star_name}).")
 
-    dataset = torch.load('data/processed_subgraphs.pt', weights_only=False)
-    splits = torch.load('data/splits.pt', weights_only=False)
+    dataset = torch.load(data_path, weights_only=False)
+    splits = torch.load(splits_path, weights_only=False)
     test_idx = splits['test_idx']
 
     # Sample representative malicious and benign test subgraphs
@@ -247,7 +263,7 @@ def run_m6_attribution_demo(output_json: str = 'results/m6_explanations.json'):
         print(f"\"{exp['explanation_string']}\"")
         print("\nATTRIBUTED AUDIT LOG EVIDENCE BREAKDOWN:")
         for node in exp['top_attributed_nodes']:
-            print(f"  [Rank {node['rank']}] Node ID {node['entity_id']} ({node['entity_type']}) | Attr Score: {node['attribution_score']:.4f} ({node['relative_importance_pct']:.1f}% of total):")
+            print(f"  [Rank {node['rank']}] Entity '{node['entity_id']}' ({node['entity_type']}) | Attr Score: {node['attribution_score']:.4f} ({node['relative_importance_pct']:.1f}% of total):")
             if node['associated_log_lines']:
                 for log_line in node['associated_log_lines'][:3]:
                     print(f"    --> {log_line}")
@@ -263,6 +279,31 @@ def run_m6_attribution_demo(output_json: str = 'results/m6_explanations.json'):
     print("MILESTONE 6 ATTRIBUTION AND LOG GROUNDING COMPLETE!")
     print("=" * 75)
 
+    return explanations
+
 
 if __name__ == '__main__':
-    run_m6_attribution_demo()
+    import argparse
+    parser = argparse.ArgumentParser(description='Node Attribution & Log Grounding at Layer l*')
+    parser.add_argument('--dataset', type=str, default='streamspot', choices=['streamspot', 'darpa_cadets'])
+    args = parser.parse_args()
+
+    if args.dataset == 'streamspot':
+        run_m6_attribution_demo(
+            checkpoint_path='checkpoints/frozen_backbone.pt',
+            probe_checkpoint_path='checkpoints/probes.pkl',
+            l_star_path='checkpoints/l_star.json',
+            data_path='data/processed_subgraphs.pt',
+            splits_path='data/splits.pt',
+            output_json='results/m6_explanations.json'
+        )
+    elif args.dataset == 'darpa_cadets':
+        run_m6_attribution_demo(
+            checkpoint_path='checkpoints/darpa_cadets/frozen_backbone.pt',
+            probe_checkpoint_path='checkpoints/darpa_cadets/probes.pkl',
+            l_star_path='checkpoints/darpa_cadets/l_star.json',
+            data_path='data/darpa_cadets/processed_subgraphs.pt',
+            splits_path='data/darpa_cadets/splits.pt',
+            output_json='results/darpa_cadets/m6_explanations.json'
+        )
+
