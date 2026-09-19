@@ -1,0 +1,26 @@
+cat << 'EOF' > .gitignore
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Datasets and raw data (external clones & large tensors)
+data/
+*.pt
+*.tar.gz
+
+# Checkpoints / models (if you do not want to track weights)
+# checkpoints/*.pt
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# OS / IDE artifacts
+.DS_Store
+.vscode/
+.idea/
+EOF

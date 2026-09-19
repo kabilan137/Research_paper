@@ -1,0 +1,43 @@
+{
+  "l_star_name": "layer_2",
+  "l_star_index": 2,
+  "reason": "Agreement reached 92.94% with minimal subsequent gain (Delta to next layer = +7.06%).",
+  "fidelity_metrics": {
+    "layer_0 (input)": {
+      "agreement": 0.7176470588235294,
+      "benign_agreement": 0.8604651162790697,
+      "malicious_agreement": 0.5714285714285714,
+      "cohen_kappa": 0.43333333333333335,
+      "pearson_corr": 0.47889092884861617,
+      "spearman_corr": 0.4796144791316208,
+      "gt_accuracy": 0.6823529411764706
+    },
+    "layer_1": {
+      "agreement": 0.8705882352941177,
+      "benign_agreement": 0.8372093023255814,
+      "malicious_agreement": 0.9047619047619048,
+      "cohen_kappa": 0.7413554633471646,
+      "pearson_corr": 0.8024194289194655,
+      "spearman_corr": 0.8142783926954539,
+      "gt_accuracy": 0.8117647058823529
+    },
+    "layer_2": {
+      "agreement": 0.9294117647058824,
+      "benign_agreement": 0.9069767441860465,
+      "malicious_agreement": 0.9523809523809523,
+      "cohen_kappa": 0.8588821250691754,
+      "pearson_corr": 0.9719004148711964,
+      "spearman_corr": 0.976572122796561,
+      "gt_accuracy": 0.9176470588235294
+    },
+    "layer_3": {
+      "agreement": 1.0,
+      "benign_agreement": 1.0,
+      "malicious_agreement": 1.0,
+      "cohen_kappa": 1.0,
+      "pearson_corr": 0.9922321380908548,
+      "spearman_corr": 0.9937495428060399,
+      "gt_accuracy": 0.9176470588235294
+    }
+  }
+}

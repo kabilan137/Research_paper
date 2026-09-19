@@ -1,0 +1,252 @@
+[
+  {
+    "graph_id": 337,
+    "subgraph_id": 2,
+    "true_label": 1,
+    "gnn_prediction": 1,
+    "gnn_confidence": 99.98493194580078,
+    "probe_decision": "malicious",
+    "probe_confidence": 99.37806701660156,
+    "l_star_index": 2,
+    "l_star_name": "layer_2",
+    "explanation_string": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 99.4%), driven primarily by: Entity 'file:2706740' (Attrib: 0.219) participating in: [\"[LogLine #27420127] thread(id:2706688) --open--> file(id:2706740)\"]; Entity 'file:2706737' (Attrib: 0.219) participating in: [\"[LogLine #27420065] thread(id:2706688) --open--> file(id:2706737)\"]; Entity 'file:2707902' (Attrib: 0.219) participating in: [\"[LogLine #27423570] thread(id:2706688) --open--> file(id:2707902)\"].",
+    "top_attributed_nodes": [
+      {
+        "rank": 1,
+        "subgraph_node_idx": 1,
+        "entity_id": "2706740",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.4780592918396,
+        "associated_log_lines": [
+          "[LogLine #27420127] thread(id:2706688) --open--> file(id:2706740)"
+        ]
+      },
+      {
+        "rank": 2,
+        "subgraph_node_idx": 4,
+        "entity_id": "2706737",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.4780592918396,
+        "associated_log_lines": [
+          "[LogLine #27420065] thread(id:2706688) --open--> file(id:2706737)"
+        ]
+      },
+      {
+        "rank": 3,
+        "subgraph_node_idx": 11,
+        "entity_id": "2707902",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.4780592918396,
+        "associated_log_lines": [
+          "[LogLine #27423570] thread(id:2706688) --open--> file(id:2707902)"
+        ]
+      }
+    ]
+  },
+  {
+    "graph_id": 337,
+    "subgraph_id": 3,
+    "true_label": 1,
+    "gnn_prediction": 1,
+    "gnn_confidence": 99.75325012207031,
+    "probe_decision": "malicious",
+    "probe_confidence": 97.51927185058594,
+    "l_star_index": 2,
+    "l_star_name": "layer_2",
+    "explanation_string": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 97.5%), driven primarily by: Entity 'file:2706242' (Attrib: 0.341) participating in: [\"[LogLine #27420397] thread(id:2706675) --write--> file(id:2706242)\", \"[LogLine #27435508] thread(id:2706170) --write--> file(id:2706242)\"]; Entity 'NA:2707926' (Attrib: 0.131) participating in: [\"[LogLine #27432992] thread(id:2706170) --recv--> NA(id:2707926)\"]; Entity 'file:2704861' (Attrib: 0.125) participating in: [\"[LogLine #27423828] thread(id:2706170) --close--> file(id:2704861)\"].",
+    "top_attributed_nodes": [
+      {
+        "rank": 1,
+        "subgraph_node_idx": 31,
+        "entity_id": "2706242",
+        "entity_type": "file",
+        "attribution_score": 0.34081727266311646,
+        "relative_importance_pct": 12.334627151489258,
+        "associated_log_lines": [
+          "[LogLine #27420397] thread(id:2706675) --write--> file(id:2706242)",
+          "[LogLine #27435508] thread(id:2706170) --write--> file(id:2706242)",
+          "[LogLine #27419739] thread(id:2706687) --write--> file(id:2706242)",
+          "[LogLine #27419704] thread(id:2706686) --write--> file(id:2706242)",
+          "[LogLine #27420188] thread(id:2706668) --write--> file(id:2706242)",
+          "[LogLine #27425762] thread(id:2706678) --write--> file(id:2706242)",
+          "[LogLine #27435016] thread(id:2706160) --write--> file(id:2706242)",
+          "[LogLine #27420444] thread(id:2706674) --write--> file(id:2706242)",
+          "[LogLine #27424267] thread(id:2707927) --write--> file(id:2706242)",
+          "[LogLine #27420435] thread(id:2706673) --write--> file(id:2706242)",
+          "[LogLine #27420608] thread(id:2706672) --write--> file(id:2706242)",
+          "[LogLine #27425933] thread(id:2706559) --write--> file(id:2706242)",
+          "[LogLine #27419582] thread(id:2706682) --write--> file(id:2706242)",
+          "[LogLine #27419576] thread(id:2706683) --write--> file(id:2706242)",
+          "[LogLine #27419648] thread(id:2706680) --write--> file(id:2706242)",
+          "[LogLine #27419858] thread(id:2706689) --write--> file(id:2706242)"
+        ]
+      },
+      {
+        "rank": 2,
+        "subgraph_node_idx": 29,
+        "entity_id": "2707926",
+        "entity_type": "NA",
+        "attribution_score": 0.13093659281730652,
+        "relative_importance_pct": 4.738768100738525,
+        "associated_log_lines": [
+          "[LogLine #27432992] thread(id:2706170) --recv--> NA(id:2707926)"
+        ]
+      },
+      {
+        "rank": 3,
+        "subgraph_node_idx": 1,
+        "entity_id": "2704861",
+        "entity_type": "file",
+        "attribution_score": 0.12531103193759918,
+        "relative_importance_pct": 4.535171985626221,
+        "associated_log_lines": [
+          "[LogLine #27423828] thread(id:2706170) --close--> file(id:2704861)"
+        ]
+      }
+    ]
+  },
+  {
+    "graph_id": 325,
+    "subgraph_id": 5,
+    "true_label": 1,
+    "gnn_prediction": 1,
+    "gnn_confidence": 99.98493194580078,
+    "probe_decision": "malicious",
+    "probe_confidence": 99.37806701660156,
+    "l_star_index": 2,
+    "l_star_name": "layer_2",
+    "explanation_string": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 99.4%), driven primarily by: Entity 'file:2602737' (Attrib: 0.219) participating in: [\"[LogLine #27082098] thread(id:2602587) --open--> file(id:2602737)\"]; Entity 'file:2603799' (Attrib: 0.219) participating in: [\"[LogLine #27084751] thread(id:2602587) --open--> file(id:2603799)\"]; Entity 'file:2602739' (Attrib: 0.219) participating in: [\"[LogLine #27082214] thread(id:2602587) --open--> file(id:2602739)\"].",
+    "top_attributed_nodes": [
+      {
+        "rank": 1,
+        "subgraph_node_idx": 1,
+        "entity_id": "2602737",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.478058338165283,
+        "associated_log_lines": [
+          "[LogLine #27082098] thread(id:2602587) --open--> file(id:2602737)"
+        ]
+      },
+      {
+        "rank": 2,
+        "subgraph_node_idx": 4,
+        "entity_id": "2603799",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.478058338165283,
+        "associated_log_lines": [
+          "[LogLine #27084751] thread(id:2602587) --open--> file(id:2603799)"
+        ]
+      },
+      {
+        "rank": 3,
+        "subgraph_node_idx": 7,
+        "entity_id": "2602739",
+        "entity_type": "file",
+        "attribution_score": 0.2189563363790512,
+        "relative_importance_pct": 6.478058338165283,
+        "associated_log_lines": [
+          "[LogLine #27082214] thread(id:2602587) --open--> file(id:2602739)"
+        ]
+      }
+    ]
+  },
+  {
+    "graph_id": 201,
+    "subgraph_id": 5,
+    "true_label": 0,
+    "gnn_prediction": 0,
+    "gnn_confidence": 100.0,
+    "probe_decision": "benign",
+    "probe_confidence": 100.0,
+    "l_star_index": 2,
+    "l_star_name": "layer_2",
+    "explanation_string": "By layer 2 (layer_2), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'NA:1524006' (Attrib: 0.407) participating in: [\"[LogLine #15264728] thread(id:1524004) --read--> NA(id:1524006)\"]; Entity 'NA:1528208' (Attrib: 0.405) participating in: [\"[LogLine #15216098] thread(id:1524004) --close--> NA(id:1528208)\"]; Entity 'NA:1528183' (Attrib: 0.405) participating in: [\"[LogLine #15214245] thread(id:1524004) --close--> NA(id:1528183)\"].",
+    "top_attributed_nodes": [
+      {
+        "rank": 1,
+        "subgraph_node_idx": 47,
+        "entity_id": "1524006",
+        "entity_type": "NA",
+        "attribution_score": 0.4067295491695404,
+        "relative_importance_pct": 3.3421173095703125,
+        "associated_log_lines": [
+          "[LogLine #15264728] thread(id:1524004) --read--> NA(id:1524006)"
+        ]
+      },
+      {
+        "rank": 2,
+        "subgraph_node_idx": 15,
+        "entity_id": "1528208",
+        "entity_type": "NA",
+        "attribution_score": 0.40538331866264343,
+        "relative_importance_pct": 3.3310554027557373,
+        "associated_log_lines": [
+          "[LogLine #15216098] thread(id:1524004) --close--> NA(id:1528208)"
+        ]
+      },
+      {
+        "rank": 3,
+        "subgraph_node_idx": 22,
+        "entity_id": "1528183",
+        "entity_type": "NA",
+        "attribution_score": 0.40538331866264343,
+        "relative_importance_pct": 3.3310554027557373,
+        "associated_log_lines": [
+          "[LogLine #15214245] thread(id:1524004) --close--> NA(id:1528183)"
+        ]
+      }
+    ]
+  },
+  {
+    "graph_id": 504,
+    "subgraph_id": 6,
+    "true_label": 0,
+    "gnn_prediction": 0,
+    "gnn_confidence": 99.99995422363281,
+    "probe_decision": "benign",
+    "probe_confidence": 99.9684066772461,
+    "l_star_index": 2,
+    "l_star_name": "layer_2",
+    "explanation_string": "By layer 2 (layer_2), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'file:4190247' (Attrib: 0.304) participating in: [\"[LogLine #61891347] thread(id:4190246) --open--> file(id:4190247)\"]; Entity 'file:4190248' (Attrib: 0.304) participating in: [\"[LogLine #61891386] thread(id:4190246) --open--> file(id:4190248)\"]; Entity 'file:4185939' (Attrib: 0.302) participating in: [\"[LogLine #61891318] thread(id:4190246) --close--> file(id:4185939)\"].",
+    "top_attributed_nodes": [
+      {
+        "rank": 1,
+        "subgraph_node_idx": 20,
+        "entity_id": "4190247",
+        "entity_type": "file",
+        "attribution_score": 0.3044465184211731,
+        "relative_importance_pct": 2.1623172760009766,
+        "associated_log_lines": [
+          "[LogLine #61891347] thread(id:4190246) --open--> file(id:4190247)"
+        ]
+      },
+      {
+        "rank": 2,
+        "subgraph_node_idx": 5,
+        "entity_id": "4190248",
+        "entity_type": "file",
+        "attribution_score": 0.3044465184211731,
+        "relative_importance_pct": 2.1623172760009766,
+        "associated_log_lines": [
+          "[LogLine #61891386] thread(id:4190246) --open--> file(id:4190248)"
+        ]
+      },
+      {
+        "rank": 3,
+        "subgraph_node_idx": 50,
+        "entity_id": "4185939",
+        "entity_type": "file",
+        "attribution_score": 0.3019018769264221,
+        "relative_importance_pct": 2.1442441940307617,
+        "associated_log_lines": [
+          "[LogLine #61891318] thread(id:4190246) --close--> file(id:4185939)"
+        ]
+      }
+    ]
+  }
+]

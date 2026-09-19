@@ -1,0 +1,167 @@
+{
+  "comparison_table": [
+    [
+      "Explainer Category",
+      "Probe-based Attribution",
+      "Post-hoc MI Masking",
+      "Parameterized Masking",
+      "Relevance Decomposition"
+    ],
+    [
+      "Base Literature",
+      "Pelletreau-Duris 2025 / ProvX 2025",
+      "Ying et al. NeurIPS 2019",
+      "Luo et al. NeurIPS 2020",
+      "Schnake et al. TPAMI 2021"
+    ],
+    [
+      "Layer-Wise Granularity",
+      "Yes (l* phase-transition layer)",
+      "No (Final layer output only)",
+      "No (Final layer output only)",
+      "Mathematical layer walks"
+    ],
+    [
+      "Log-Grounded Resolution",
+      "Yes (Full audit event logs)",
+      "No (Abstract node/edge masks)",
+      "No (Abstract edge masks)",
+      "No (Graph walk paths)"
+    ],
+    [
+      "Inference Overhead",
+      "Very Low (< 0.05s, 1-pass probe)",
+      "High (~0.8s, 80-step optim)",
+      "Low (~0.02s, neural pass)",
+      "High (walk combinatorial)"
+    ],
+    [
+      "Backbone Invariance",
+      "Frozen (Strict read-only)",
+      "Requires model gradients",
+      "Requires model embeddings",
+      "Requires layer weights"
+    ],
+    [
+      "Decision Phase-Transition",
+      "Identified (l* = 2, kappa=0.86)",
+      "Undefined",
+      "Undefined",
+      "Undefined"
+    ]
+  ],
+  "case_studies": [
+    {
+      "case_name": "Malicious Subgraph (Graph 337, Sub 2)",
+      "nodes": 16,
+      "edges": 15,
+      "our_method": {
+        "latency_sec": 0.0044,
+        "layer_identified": "l* = 2 (layer_2)",
+        "top_attributed_nodes": [
+          "Node 2706740 (file)",
+          "Node 2706737 (file)",
+          "Node 2707902 (file)"
+        ],
+        "log_grounded_evidence": [
+          "[LogLine #27420127] thread(id:2706688) --open--> file(id:2706740)",
+          "[LogLine #27420065] thread(id:2706688) --open--> file(id:2706737)"
+        ],
+        "explanation": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 99.4%), driven primarily by: Entity 'file:2706740' (Attrib: 0.219) participating in: [\"[LogLine #27420127] thread(id:2706688) --open--> file(id:2706740)\"]; Entity 'file:2706737' (Attrib: 0.219) participating in: [\"[LogLine #27420065] thread(id:2706688) --open--> file(id:2706737)\"]; Entity 'file:2707902' (Attrib: 0.219) participating in: [\"[LogLine #27423570] thread(id:2706688) --open--> file(id:2707902)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.0336,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": [
+          "Node 2706688 (idx:9)",
+          "Node 2706737 (idx:4)",
+          "Node 2707890 (idx:10)"
+        ],
+        "salient_edges_count": 9,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0003,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    },
+    {
+      "case_name": "Malicious Subgraph (Graph 325, Sub 5)",
+      "nodes": 16,
+      "edges": 15,
+      "our_method": {
+        "latency_sec": 0.0014,
+        "layer_identified": "l* = 2 (layer_2)",
+        "top_attributed_nodes": [
+          "Node 2602737 (file)",
+          "Node 2603799 (file)",
+          "Node 2602739 (file)"
+        ],
+        "log_grounded_evidence": [
+          "[LogLine #27082098] thread(id:2602587) --open--> file(id:2602737)",
+          "[LogLine #27084751] thread(id:2602587) --open--> file(id:2603799)"
+        ],
+        "explanation": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 99.4%), driven primarily by: Entity 'file:2602737' (Attrib: 0.219) participating in: [\"[LogLine #27082098] thread(id:2602587) --open--> file(id:2602737)\"]; Entity 'file:2603799' (Attrib: 0.219) participating in: [\"[LogLine #27084751] thread(id:2602587) --open--> file(id:2603799)\"]; Entity 'file:2602739' (Attrib: 0.219) participating in: [\"[LogLine #27082214] thread(id:2602587) --open--> file(id:2602739)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.033,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": [
+          "Node 2602587 (idx:11)",
+          "Node 2600175 (idx:5)",
+          "Node 2602737 (idx:1)"
+        ],
+        "salient_edges_count": 6,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0003,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    },
+    {
+      "case_name": "Benign Subgraph (Graph 201, Sub 5)",
+      "nodes": 61,
+      "edges": 81,
+      "our_method": {
+        "latency_sec": 0.0015,
+        "layer_identified": "l* = 2 (layer_2)",
+        "top_attributed_nodes": [
+          "Node 1524006 (NA)",
+          "Node 1528208 (NA)",
+          "Node 1528183 (NA)"
+        ],
+        "log_grounded_evidence": [
+          "[LogLine #15264728] thread(id:1524004) --read--> NA(id:1524006)",
+          "[LogLine #15216098] thread(id:1524004) --close--> NA(id:1528208)"
+        ],
+        "explanation": "By layer 2 (layer_2), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'NA:1524006' (Attrib: 0.407) participating in: [\"[LogLine #15264728] thread(id:1524004) --read--> NA(id:1524006)\"]; Entity 'NA:1528208' (Attrib: 0.405) participating in: [\"[LogLine #15216098] thread(id:1524004) --close--> NA(id:1528208)\"]; Entity 'NA:1528183' (Attrib: 0.405) participating in: [\"[LogLine #15214245] thread(id:1524004) --close--> NA(id:1528183)\"]."
+      },
+      "gnn_explainer": {
+        "latency_sec": 0.0408,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": [
+          "Node 1524004 (idx:3)",
+          "Node 1525807 (idx:10)",
+          "Node 1525801 (idx:34)"
+        ],
+        "salient_edges_count": 3,
+        "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
+      },
+      "pg_explainer": {
+        "latency_sec": 0.0004,
+        "layer_identified": "Final Layer Only (L3, Black-box)",
+        "top_attributed_nodes": "None (Edge mask only)",
+        "salient_edges_count": 0,
+        "log_grounded_evidence": "None (Raw edge mask tensor only)"
+      }
+    }
+  ],
+  "gnn_lrp_distinction": "Schnake et al. (GNN-LRP, IEEE TPAMI 2021) performs layer-wise relevance decomposition using fixed mathematical conservation rules (z-rule / epsilon-rule). In contrast, our method adapts Pelletreau-Duris et al. (NeSy 2025) using learned, empirically validated probes with statistical fidelity verification against the frozen model to identify the empirical decision phase-transition layer l*."
+}
