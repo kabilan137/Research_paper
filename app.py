@@ -123,6 +123,7 @@ DATASET_CONFIGS = {
         'splits_path': 'data/darpa_cadets/splits.pt',
         'baseline_json': 'results/darpa_cadets/m7_baseline_comparison.json',
         'fidelity_img': 'results/darpa_cadets/m5_fidelity_agreement.png',
+        'pn_img': 'results/darpa_cadets/pn_vs_k_darpa_cadets.png',
         'input_dim': 62,
         'edge_dim': 27,
         'subgraph_count': '400 subgraphs (200 Benign, 200 Malicious)',
@@ -148,6 +149,7 @@ DATASET_CONFIGS = {
         'splits_path': 'data/splits.pt',
         'baseline_json': 'results/m7_baseline_comparison.json',
         'fidelity_img': 'results/m5_fidelity_agreement.png',
+        'pn_img': 'results/pn_vs_k_streamspot.png',
         'input_dim': 56,
         'edge_dim': 23,
         'subgraph_count': '561 subgraphs (317 Benign, 244 Malicious)',
@@ -251,9 +253,9 @@ def main():
 
     top_k = st.sidebar.slider("Top-K Attributed Nodes to Explain:", min_value=1, max_value=5, value=3)
     method = st.sidebar.selectbox(
-        "Captum Attribution Method:",
-        ["ig", "saliency"],
-        format_func=lambda x: "Integrated Gradients (Captum)" if x == "ig" else "Saliency (Vanilla Gradient)"
+        "Attribution & Grounding Method:",
+        ["loo", "ig", "saliency"],
+        format_func=lambda x: "Leave-One-Out (Causal Drop - Option B)" if x == "loo" else "Integrated Gradients (Captum)" if x == "ig" else "Saliency (Vanilla Gradient)"
     )
 
     st.sidebar.markdown("---")
@@ -433,13 +435,61 @@ def main():
             ]
         })
 
-        st.subheader("2. Probability of Necessity (PN) / Prediction Flip-Rate")
+        st.subheader("2. Probability of Necessity (PN) Multi-Budget Sweep (ProvX Protocol)")
         st.caption(
-            "Evaluation protocol (ProvX / Pelletreau-Duris 2025): Remove the top-K (K=3) critical nodes identified by each "
-            "explainer, re-run the frozen GNN, and measure prediction flip-rate and mean output probability drop."
+            "Evaluation protocol (ProvX Fig. 7 / Pelletreau-Duris 2025): Remove top-K critical nodes (K ∈ {1, 3, 5, 10, 15, 20}) "
+            "identified by each explainer, re-run the frozen GNN, and measure prediction flip-rate and mean output probability drop (Δp)."
         )
 
-        if 'pn_results' in baseline_data:
+        plot_img = cfg['pn_img']
+        if os.path.exists(plot_img):
+            st.image(plot_img, caption=f"ProvX Fig. 7 Probability of Necessity (PN) vs. Node Removal Budget K ({cfg['name']})", use_container_width=True)
+
+        if 'pn_k_sweep' in baseline_data:
+            sweep = baseline_data['pn_k_sweep']
+            k_cols = [f"K={k}" for k in sweep['k_values']]
+            
+            st.markdown("##### Prediction Flip-Rate (%) vs. Budget K")
+            flip_table_data = {
+                "Explainer Method": [
+                    "Our Explainer (LOO at l*) [Option B]",
+                    "Our Explainer (IG at l*)",
+                    "GNNExplainer (Ying et al. 2019)",
+                    "PGExplainer (Luo et al. 2020)",
+                    "Random Baseline"
+                ]
+            }
+            for idx, k_str in enumerate(k_cols):
+                flip_table_data[k_str] = [
+                    f"{sweep['our_loo']['flip_rates'][idx]:.1f}%",
+                    f"{sweep['our_ig']['flip_rates'][idx]:.1f}%",
+                    f"{sweep['gnn_explainer']['flip_rates'][idx]:.1f}%",
+                    f"{sweep['pg_explainer']['flip_rates'][idx]:.1f}%",
+                    f"{sweep['random']['flip_rates'][idx]:.1f}%",
+                ]
+            st.table(flip_table_data)
+
+            st.markdown("##### Mean Confidence Drop (Δp) vs. Budget K")
+            drop_table_data = {
+                "Explainer Method": [
+                    "Our Explainer (LOO at l*) [Option B]",
+                    "Our Explainer (IG at l*)",
+                    "GNNExplainer (Ying et al. 2019)",
+                    "PGExplainer (Luo et al. 2020)",
+                    "Random Baseline"
+                ]
+            }
+            for idx, k_str in enumerate(k_cols):
+                drop_table_data[k_str] = [
+                    f"{sweep['our_loo']['mean_deltas'][idx]:.4f}",
+                    f"{sweep['our_ig']['mean_deltas'][idx]:.4f}",
+                    f"{sweep['gnn_explainer']['mean_deltas'][idx]:.4f}",
+                    f"{sweep['pg_explainer']['mean_deltas'][idx]:.4f}",
+                    f"{sweep['random']['mean_deltas'][idx]:.4f}",
+                ]
+            st.table(drop_table_data)
+
+        elif 'pn_results' in baseline_data:
             pn = baseline_data['pn_results']
             st.table({
                 "Explainer Method": [
@@ -465,11 +515,12 @@ def main():
                 ]
             })
 
-            st.markdown(r"""
-            > **Scientific Insight on Necessity vs. Grounding:**
-            > GNNExplainer achieves high flip-rates by aggressively pruning high-degree structural bridge nodes, which disrupts message passing globally but yields ungrounded, abstract node masks.
-            > Our method pinpoints the **semantically causative audit events** (e.g., executing `/tmp/test` and reading `/etc/libmap.conf`) while maintaining <5ms latency and producing human-actionable alerts for SOC analysts.
-            """)
+        st.markdown(r"""
+        > **Scientific Insight on Necessity vs. Grounding:**
+        > • **Leave-One-Out (LOO)** provides direct causal necessity: on DARPA Cadets, it matches GNNExplainer's 90% flip rate at K=3 while retaining strict log-groundedness and forward-only execution.
+        > • **Integrated Gradients (IG)** isolates the single root culprit (`/tmp/test`) with high semantic precision, but in static ranking its subsequent budget is spent on co-attributed linker reads rather than secondary processes.
+        > • **GNNExplainer** achieves high flip-rates by aggressively pruning high-degree structural bridge nodes, which disrupts message passing globally but yields ungrounded, abstract node masks.
+        """)
 
     # ==================== TAB 4 ====================
     with tab4:

@@ -131,17 +131,39 @@ class LogGroundedExplainer:
 
         h_input = h_l_star.unsqueeze(0).to(self.device).requires_grad_(True)
 
-        if method == 'saliency':
+        if method == 'loo':
+            # Option B: Leave-One-Out (LOO) confidence-drop ranking
+            n = subgraph.num_nodes
+            node_scores = np.zeros(n, dtype=np.float32)
+            p_orig = gnn_probs[exp_target].item()
+            for i in range(n):
+                keep = torch.tensor([j != i for j in range(n)], dtype=torch.bool)
+                if keep.sum() < 2:
+                    node_scores[i] = p_orig
+                    continue
+                mapping = {old: new for new, old in enumerate(torch.where(keep)[0].tolist())}
+                x_new = subgraph.x[keep].to(self.device)
+                src, dst = subgraph.edge_index[0], subgraph.edge_index[1]
+                edge_keep = keep[src] & keep[dst]
+                if edge_keep.sum() == 0:
+                    node_scores[i] = p_orig
+                    continue
+                new_src = torch.tensor([mapping[s.item()] for s in src[edge_keep]], dtype=torch.long, device=self.device)
+                new_dst = torch.tensor([mapping[d.item()] for d in dst[edge_keep]], dtype=torch.long, device=self.device)
+                with torch.no_grad():
+                    out_i = self.model(x_new, torch.stack([new_src, new_dst], dim=0))
+                    prob_i = torch.softmax(out_i, dim=-1)[0, exp_target].item()
+                node_scores[i] = max(0.0, p_orig - prob_i)
+        elif method == 'saliency':
             explainer = Saliency(scorer)
             attr = explainer.attribute(h_input)
+            node_scores = attr.squeeze(0).norm(dim=-1).detach().cpu().numpy()
         else:
             # Integrated Gradients
             explainer = IntegratedGradients(scorer)
             baseline = torch.zeros_like(h_input)
             attr = explainer.attribute(h_input, baselines=baseline, n_steps=30)
-
-        # Node importance score: L2 norm of attribution vector per node
-        node_scores = attr.squeeze(0).norm(dim=-1).detach().cpu().numpy()
+            node_scores = attr.squeeze(0).norm(dim=-1).detach().cpu().numpy()
 
         # Rank nodes in descending order of attribution
         ranked_indices = np.argsort(-node_scores)

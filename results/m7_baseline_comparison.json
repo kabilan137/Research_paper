@@ -25,10 +25,10 @@
       "No (Raw edge masks)"
     ],
     [
-      "Probability of Necessity",
-      "0.000 drop",
-      "0.626 drop",
-      "N/A"
+      "Probability of Necessity (K=3)",
+      "0.523 drop (LOO) / 0.000 drop (IG)",
+      "0.622 drop",
+      "0.484 drop"
     ],
     [
       "Inference Overhead",
@@ -43,7 +43,107 @@
       "Requires embeddings"
     ]
   ],
-  "pn_results": {
+  "pn_k_sweep": {
+    "k_values": [
+      1,
+      3,
+      5,
+      10,
+      15,
+      20
+    ],
+    "our_ig": {
+      "flip_rates": [
+        10.0,
+        10.0,
+        10.0,
+        20.0,
+        60.0,
+        80.0
+      ],
+      "mean_deltas": [
+        2.384185791015625e-06,
+        0.00011034011840820313,
+        0.0006431221961975097,
+        0.10104341506958008,
+        0.5463938802480698,
+        0.699080428481102
+      ]
+    },
+    "our_loo": {
+      "flip_rates": [
+        50.0,
+        60.0,
+        70.0,
+        80.0,
+        90.0,
+        100.0
+      ],
+      "mean_deltas": [
+        0.4553895443677902,
+        0.5231676727533341,
+        0.5477229416370392,
+        0.6463669389486313,
+        0.8086772071197629,
+        0.8809863317757844
+      ]
+    },
+    "gnn_explainer": {
+      "flip_rates": [
+        40.0,
+        70.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0
+      ],
+      "mean_deltas": [
+        0.43093782663345337,
+        0.6290954858064651,
+        0.7014703780412674,
+        0.698787996172905,
+        0.7204758197069168,
+        0.7066273003816604
+      ]
+    },
+    "pg_explainer": {
+      "flip_rates": [
+        40.0,
+        50.0,
+        60.0,
+        70.0,
+        80.0,
+        100.0
+      ],
+      "mean_deltas": [
+        0.4225394368171692,
+        0.48372651934623717,
+        0.5306266814470291,
+        0.6027673572301865,
+        0.7002235859632492,
+        0.8832642585039139
+      ]
+    },
+    "random": {
+      "flip_rates": [
+        6.0,
+        16.0,
+        28.0,
+        48.0,
+        74.0,
+        86.0
+      ],
+      "mean_deltas": [
+        0.003311399221420288,
+        0.11716890811920164,
+        0.23898781299591065,
+        0.4147739917039871,
+        0.6529701684415341,
+        0.7551744151115418
+      ]
+    }
+  },
+  "pn_results_k3": {
     "cohort_size": 10,
     "k_nodes": 3,
     "our_method": {
@@ -51,15 +151,20 @@
       "flip_count": 1,
       "mean_prob_drop": 0.00011034011840820313
     },
+    "our_loo": {
+      "flip_rate": 0.6,
+      "flip_count": 6,
+      "mean_prob_drop": 0.5231676727533341
+    },
     "gnn_explainer": {
       "flip_rate": 0.7,
       "flip_count": 7,
-      "mean_prob_drop": 0.6255800694227218
+      "mean_prob_drop": 0.622349026799202
     },
     "random": {
       "flip_rate": 0.2,
       "flip_count": 2,
-      "mean_prob_drop": 0.10446221828460693
+      "mean_prob_drop": 0.10336797833442687
     }
   },
   "case_studies": [
@@ -68,7 +173,7 @@
       "nodes": 16,
       "edges": 15,
       "our_method": {
-        "latency_sec": 0.004,
+        "latency_sec": 0.0041,
         "layer_identified": "l* = 2 (layer_2)",
         "top_attributed_nodes": [
           "file:2706740",
@@ -82,14 +187,14 @@
         "explanation": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 99.4%), driven primarily by: Entity 'file:2706740' (Attrib: 0.219) participating in: [\"[LogLine #27420127] thread(id:2706688) --open--> file(id:2706740)\"]; Entity 'file:2706737' (Attrib: 0.219) participating in: [\"[LogLine #27420065] thread(id:2706688) --open--> file(id:2706737)\"]; Entity 'file:2707902' (Attrib: 0.219) participating in: [\"[LogLine #27423570] thread(id:2706688) --open--> file(id:2707902)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.0166,
+        "latency_sec": 0.0172,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:9",
-          "Node idx:6",
-          "Node idx:8"
+          "Node idx:2",
+          "Node idx:15"
         ],
-        "salient_edges_count": 12,
+        "salient_edges_count": 7,
         "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
       },
       "pg_explainer": {
@@ -105,7 +210,7 @@
       "nodes": 37,
       "edges": 41,
       "our_method": {
-        "latency_sec": 0.0013,
+        "latency_sec": 0.0014,
         "layer_identified": "l* = 2 (layer_2)",
         "top_attributed_nodes": [
           "file:2706242",
@@ -119,14 +224,14 @@
         "explanation": "By layer 2 (layer_2), the model had already committed to 'malicious' (Confidence: 97.5%), driven primarily by: Entity 'file:2706242' (Attrib: 0.341) participating in: [\"[LogLine #27420397] thread(id:2706675) --write--> file(id:2706242)\", \"[LogLine #27435508] thread(id:2706170) --write--> file(id:2706242)\"]; Entity 'NA:2707926' (Attrib: 0.131) participating in: [\"[LogLine #27432992] thread(id:2706170) --recv--> NA(id:2707926)\"]; Entity 'file:2704861' (Attrib: 0.125) participating in: [\"[LogLine #27423828] thread(id:2706170) --close--> file(id:2704861)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.0196,
+        "latency_sec": 0.0197,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:4",
           "Node idx:14",
           "Node idx:27"
         ],
-        "salient_edges_count": 7,
+        "salient_edges_count": 9,
         "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
       },
       "pg_explainer": {
@@ -142,7 +247,7 @@
       "nodes": 61,
       "edges": 81,
       "our_method": {
-        "latency_sec": 0.0013,
+        "latency_sec": 0.0014,
         "layer_identified": "l* = 2 (layer_2)",
         "top_attributed_nodes": [
           "NA:1524006",
@@ -156,18 +261,18 @@
         "explanation": "By layer 2 (layer_2), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'NA:1524006' (Attrib: 0.407) participating in: [\"[LogLine #15264728] thread(id:1524004) --read--> NA(id:1524006)\"]; Entity 'NA:1528208' (Attrib: 0.405) participating in: [\"[LogLine #15216098] thread(id:1524004) --close--> NA(id:1528208)\"]; Entity 'NA:1528183' (Attrib: 0.405) participating in: [\"[LogLine #15214245] thread(id:1524004) --close--> NA(id:1528183)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.0208,
+        "latency_sec": 0.0206,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:3",
           "Node idx:10",
-          "Node idx:34"
+          "Node idx:8"
         ],
-        "salient_edges_count": 2,
+        "salient_edges_count": 0,
         "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
       },
       "pg_explainer": {
-        "latency_sec": 0.0005,
+        "latency_sec": 0.0004,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": "None (Edge mask only)",
         "salient_edges_count": 0,

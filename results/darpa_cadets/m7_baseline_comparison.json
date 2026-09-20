@@ -25,10 +25,10 @@
       "No (Raw edge masks)"
     ],
     [
-      "Probability of Necessity",
-      "0.444 drop",
+      "Probability of Necessity (K=3)",
+      "0.936 drop (LOO) / 0.444 drop (IG)",
       "0.918 drop",
-      "N/A"
+      "0.000 drop"
     ],
     [
       "Inference Overhead",
@@ -43,7 +43,107 @@
       "Requires embeddings"
     ]
   ],
-  "pn_results": {
+  "pn_k_sweep": {
+    "k_values": [
+      1,
+      3,
+      5,
+      10,
+      15,
+      20
+    ],
+    "our_ig": {
+      "flip_rates": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_deltas": [
+        0.4443479418754578,
+        0.44438098669052123,
+        0.4444149434566498,
+        0.4445041000843048,
+        0.4445999085903168,
+        0.44470306634902956
+      ]
+    },
+    "our_loo": {
+      "flip_rates": [
+        0.0,
+        90.0,
+        90.0,
+        90.0,
+        90.0,
+        90.0
+      ],
+      "mean_deltas": [
+        0.46223918795585633,
+        0.9358339369297027,
+        0.9358533322811127,
+        0.9359048843383789,
+        0.9360167920589447,
+        0.9360477685928345
+      ]
+    },
+    "gnn_explainer": {
+      "flip_rates": [
+        0.0,
+        90.0,
+        90.0,
+        90.0,
+        90.0,
+        90.0
+      ],
+      "mean_deltas": [
+        0.46223918795585633,
+        0.918198037147522,
+        0.9185844719409942,
+        0.9198292195796967,
+        0.9209276258945465,
+        0.9221235036849975
+      ]
+    },
+    "pg_explainer": {
+      "flip_rates": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_deltas": [
+        1.1920928955078126e-08,
+        1.1920928955078126e-08,
+        2.384185791015625e-08,
+        5.960464477539063e-08,
+        1.7881393432617188e-07,
+        4.0531158447265624e-07
+      ]
+    },
+    "random": {
+      "flip_rates": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_deltas": [
+        0.009878003597259523,
+        0.02964118599891663,
+        0.033184537887573244,
+        0.05550828099250793,
+        0.05910339593887328,
+        0.09245350122451783
+      ]
+    }
+  },
+  "pn_results_k3": {
     "cohort_size": 10,
     "k_nodes": 3,
     "our_method": {
@@ -51,15 +151,20 @@
       "flip_count": 0,
       "mean_prob_drop": 0.44438098669052123
     },
+    "our_loo": {
+      "flip_rate": 0.9,
+      "flip_count": 9,
+      "mean_prob_drop": 0.9358339369297027
+    },
     "gnn_explainer": {
       "flip_rate": 0.9,
       "flip_count": 9,
-      "mean_prob_drop": 0.9182561159133911
+      "mean_prob_drop": 0.9182561099529266
     },
     "random": {
       "flip_rate": 0.0,
       "flip_count": 0,
-      "mean_prob_drop": 2.968311309814453e-06
+      "mean_prob_drop": 0.04939882755279541
     }
   },
   "case_studies": [
@@ -68,7 +173,7 @@
       "nodes": 150,
       "edges": 173,
       "our_method": {
-        "latency_sec": 0.0044,
+        "latency_sec": 0.0045,
         "layer_identified": "l* = 1 (layer_1)",
         "top_attributed_nodes": [
           "process:/tmp/test",
@@ -82,14 +187,14 @@
         "explanation": "By layer 1 (layer_1), the model had already committed to 'malicious' (Confidence: 99.1%), driven primarily by: Entity 'process:/tmp/test' (Attrib: 0.309) participating in: [\"[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)\", \"[Cadets Event] file(/var/run/ld-elf.so.hints) --EVENT_READ--> process(/tmp/test)\"]; Entity 'file:file_269399' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269399)\"]; Entity 'file:file_269414' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269414)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.0259,
+        "latency_sec": 0.0262,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:143",
           "Node idx:148",
           "Node idx:142"
         ],
-        "salient_edges_count": 2,
+        "salient_edges_count": 1,
         "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
       },
       "pg_explainer": {
@@ -119,7 +224,7 @@
         "explanation": "By layer 1 (layer_1), the model had already committed to 'malicious' (Confidence: 99.1%), driven primarily by: Entity 'process:/tmp/test' (Attrib: 0.309) participating in: [\"[Cadets Event] file(/etc/libmap.conf) --EVENT_READ--> process(/tmp/test)\", \"[Cadets Event] file(/var/run/ld-elf.so.hints) --EVENT_READ--> process(/tmp/test)\"]; Entity 'file:file_269398' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269398)\"]; Entity 'file:file_269414' (Attrib: 0.266) participating in: [\"[Cadets Event] process(/tmp/test) --EVENT_CLOSE--> file(file_269414)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.0256,
+        "latency_sec": 0.0259,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:144",
@@ -142,7 +247,7 @@
       "nodes": 150,
       "edges": 193,
       "our_method": {
-        "latency_sec": 0.0015,
+        "latency_sec": 0.0016,
         "layer_identified": "l* = 1 (layer_1)",
         "top_attributed_nodes": [
           "file:file_3838",
@@ -156,14 +261,14 @@
         "explanation": "By layer 1 (layer_1), the model had already committed to 'benign' (Confidence: 100.0%), driven primarily by: Entity 'file:file_3838' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_WRITE--> file(file_3838)\"]; Entity 'netflow:netflow_9060' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_CONNECT--> netflow(netflow_9060)\"]; Entity 'netflow:netflow_346' (Attrib: 0.196) participating in: [\"[Cadets Event] process(process_5) --EVENT_CONNECT--> netflow(netflow_346)\"]."
       },
       "gnn_explainer": {
-        "latency_sec": 0.026,
+        "latency_sec": 0.0262,
         "layer_identified": "Final Layer Only (Black-box)",
         "top_attributed_nodes": [
           "Node idx:114",
           "Node idx:93",
           "Node idx:0"
         ],
-        "salient_edges_count": 25,
+        "salient_edges_count": 19,
         "log_grounded_evidence": "None (Raw edge/feature mask tensors only)"
       },
       "pg_explainer": {
